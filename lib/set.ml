@@ -44,19 +44,21 @@ let rec insert x t =
         else if x < v1 then
           match insert_internal x left with
           | `Up new_left ->
-              `Up (TwoNode (v1, new_left, TwoNode (v2, middle, right)))
+              `Up (TwoNode (v1, new_left, TwoNode (v2, empty, empty)))
           | `Node new_left ->
               `Node (ThreeNode (v1, v2, new_left, middle, right))
         else if x < v2 then
           match insert_internal x middle with
           | `Up new_middle ->
-              `Up (TwoNode (v2, TwoNode (v1, left, new_middle), right))
+              `Up
+                (TwoNode
+                   (x, TwoNode (v1, empty, empty), TwoNode (v2, empty, empty)))
           | `Node new_middle ->
               `Node (ThreeNode (v1, v2, left, new_middle, right))
         else
           match insert_internal x right with
           | `Up new_right ->
-              `Up (TwoNode (v2, TwoNode (v1, left, middle), new_right))
+              `Up (TwoNode (v2, TwoNode (v1, empty, empty), new_right))
           | `Node new_right ->
               `Node (ThreeNode (v1, v2, left, middle, new_right)))
   in
@@ -76,3 +78,8 @@ let to_string string_of_element t =
           (tree_to_string right)
   in
   tree_to_string t
+
+let create_three_node v1 v2 left middle right =
+  ThreeNode (v1, v2, left, middle, right)
+
+let create_two_node v1 left right = TwoNode (v1, left, right)

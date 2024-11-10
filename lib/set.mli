@@ -17,3 +17,9 @@ val insert : 'a -> 'a t -> 'a t
 val to_string : ('a -> string) -> 'a t -> string
 (** [to_string s] returns a string representation of set [s], useful for
     debugging. *)
+
+val create_three_node : 'a -> 'a -> 'a t -> 'a t -> 'a t -> 'a t
+(** [create_three_node v1 v2 left middle right] creates a ThreeNode for testing. *)
+
+val create_two_node : 'a -> 'a t -> 'a t -> 'a t
+(** [create_three_node v1 v2 left middle right] creates a ThreeNode for testing. *)
