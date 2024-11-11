@@ -28,43 +28,64 @@ let rec mem x t =
 let rec insert x t =
   let rec insert_internal x t =
     match t with
-    | Leaf -> `Up (TwoNode (x, Leaf, Leaf))
-    | TwoNode (v, left, right) -> (
-        if x = v then `Node (TwoNode (v, left, right))
+    | Leaf -> (`Up (TwoNode (x, Leaf, Leaf)), true)
+    | TwoNode (v, left, right) ->
+        if x = v then (`Node (TwoNode (v, left, right)), false)
         else if x < v then
-          match insert_internal x left with
-          | `Up new_child -> `Up (ThreeNode (x, v, new_child, right, Leaf))
-          | `Node new_left -> `Node (TwoNode (v, new_left, right))
+          let result, grow = insert_internal x left in
+          if grow then
+            match result with
+            | `Up new_child ->
+                (`Up (ThreeNode (x, v, new_child, right, Leaf)), true)
+            | `Node new_left -> (`Node (TwoNode (v, new_left, right)), false)
+          else (`Node (TwoNode (v, left, right)), false)
         else
-          match insert_internal x right with
-          | `Up new_child -> `Up (ThreeNode (v, x, left, new_child, Leaf))
-          | `Node new_right -> `Node (TwoNode (v, left, new_right)))
-    | ThreeNode (v1, v2, left, middle, right) -> (
-        if x = v1 || x = v2 then `Node (ThreeNode (v1, v2, left, middle, right))
+          let result, grow = insert_internal x right in
+          if grow then
+            match result with
+            | `Up new_child ->
+                (`Up (ThreeNode (v, x, left, new_child, Leaf)), true)
+            | `Node new_right -> (`Node (TwoNode (v, left, new_right)), false)
+          else (`Node (TwoNode (v, left, right)), false)
+    | ThreeNode (v1, v2, left, middle, right) ->
+        if x = v1 || x = v2 then
+          (`Node (ThreeNode (v1, v2, left, middle, right)), false)
         else if x < v1 then
-          match insert_internal x left with
-          | `Up new_left ->
-              `Up (TwoNode (v1, new_left, TwoNode (v2, empty, empty)))
-          | `Node new_left ->
-              `Node (ThreeNode (v1, v2, new_left, middle, right))
+          let result, grow = insert_internal x left in
+          if grow then
+            match result with
+            | `Up new_left ->
+                (`Up (TwoNode (v1, new_left, TwoNode (v2, middle, right))), true)
+            | `Node new_left ->
+                (`Node (ThreeNode (v1, v2, new_left, middle, right)), false)
+          else (`Node (ThreeNode (v1, v2, left, middle, right)), false)
         else if x < v2 then
-          match insert_internal x middle with
-          | `Up new_middle ->
-              `Up
-                (TwoNode
-                   (x, TwoNode (v1, empty, empty), TwoNode (v2, empty, empty)))
-          | `Node new_middle ->
-              `Node (ThreeNode (v1, v2, left, new_middle, right))
+          let result, grow = insert_internal x middle in
+          if grow then
+            match result with
+            | `Up new_middle ->
+                ( `Up
+                    (TwoNode
+                       ( x,
+                         TwoNode (v1, left, new_middle),
+                         TwoNode (v2, middle, right) )),
+                  true )
+            | `Node new_middle ->
+                (`Node (ThreeNode (v1, v2, left, new_middle, right)), false)
+          else (`Node (ThreeNode (v1, v2, left, middle, right)), false)
         else
-          match insert_internal x right with
-          | `Up new_right ->
-              `Up (TwoNode (v2, TwoNode (v1, empty, empty), new_right))
-          | `Node new_right ->
-              `Node (ThreeNode (v1, v2, left, middle, new_right)))
+          let result, grow = insert_internal x right in
+          if grow then
+            match result with
+            | `Up new_right ->
+                (`Up (TwoNode (v2, TwoNode (v1, left, middle), new_right)), true)
+            | `Node new_right ->
+                (`Node (ThreeNode (v1, v2, left, middle, new_right)), false)
+          else (`Node (ThreeNode (v1, v2, left, middle, right)), false)
   in
   match insert_internal x t with
-  | `Up new_root -> new_root
-  | `Node tree -> tree
+  | `Up new_root, _ -> new_root
+  | `Node tree, _ -> tree
 
 let to_string string_of_element t =
   let rec tree_to_string = function
