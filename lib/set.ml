@@ -33,11 +33,11 @@ let rec insert x t =
         if x = v then `Node (TwoNode (v, left, right))
         else if x < v then
           match insert_internal x left with
-          | `Up new_child -> `Up (ThreeNode (x, v, new_child, right, Leaf))
+          | `Up new_child -> `Up (ThreeNode (x, v, new_child, right, empty))
           | `Node new_left -> `Node (TwoNode (v, new_left, right))
         else
           match insert_internal x right with
-          | `Up new_child -> `Up (ThreeNode (v, x, left, new_child, Leaf))
+          | `Up new_child -> `Up (ThreeNode (v, x, left, new_child, empty))
           | `Node new_right -> `Node (TwoNode (v, left, new_right)))
     | ThreeNode (v1, v2, left, middle, right) -> (
         if x = v1 || x = v2 then `Node (ThreeNode (v1, v2, left, middle, right))
@@ -65,23 +65,20 @@ let rec insert x t =
   match insert_internal x t with
   | `Up new_root -> new_root
   | `Node tree -> tree
+(
+let split_three_node x t =
+  match t with
+  | ThreeNode (v1, v2, left, middle, right) ->
+    if x < v1 then
+       TwoNode (v1, TwoNode(x, empty, empty), TwoNode(v2, empty, empty)), true
+    else if x < v2 then failwith "TODO"
+    else TwoNode (v2, TwoNode(v1, empty, empty), TwoNode(x, empty, empty)), true
+  | _ -> failwith "can't split a TwoNode"
 
-let rec insert2 x t =
-  let rec insertion x t =
-    match t with
-    | Leaf -> `Up (TwoNode (x, empty, empty))
-    | TwoNode (v, left, right) -> (
-      if x = v then `Node (TwoNode (v, left, right))
-      else if x < v then
-        match insertion x left with
-        | `Up new_child -> `Up (ThreeNode (x, v, new_child, right, empty))
-        | `Node new_left -> `Node (TwoNode (v, new_left, right))
-      else
-        match insertion x right with
-        | `Up new_child -> `Up (ThreeNode (v, x, left, new_child, empty))
-        | `Node new_right -> `Node (TwoNode (v, left, new_right)))
-    | ThreeNode (v1, v2, left, middle, right) -> (
-    )
+let merge_two_node x t =
+  match t with
+  | TwoNode (v, left, right) ->
+    if x < v then ThreeNode
 
 let to_string string_of_element t =
   let rec tree_to_string = function
