@@ -10,13 +10,13 @@ val is_empty : 'a t -> bool
 val mem : 'a -> 'a t -> bool
 (** [mem x s] returns true if [x] is in set [s], otherwise false. *)
 
-val insert : 'a -> 'a t -> 'a t
-(** [insert x s] returns a new set that includes [x] in [s]. If [x] is already
-    in [s], returns [s] unchanged. *)
-
 val to_string : ('a -> string) -> 'a t -> string
 (** [to_string s] returns a string representation of set [s], useful for
     debugging. *)
+
+val insert : int -> int t -> int t
+(** [insert x s] returns a new set that includes [x] in [s]. If [x] is already
+    in [s], returns [s] unchanged. *)
 
 val create_three_node : 'a -> 'a -> 'a t -> 'a t -> 'a t -> 'a t
 (** [create_three_node v1 v2 left middle right] creates a ThreeNode for testing. *)
