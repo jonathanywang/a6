@@ -2,17 +2,40 @@ open OUnit2
 open A6.Set
 
 (* Test helpers using to_string for comparison *)
+
+(** [test_is_empty tree expected] checks if the tree [tree] is empty and
+    compares the result to [expected].
+    @param tree the set tree to test
+    @param expected the expected boolean result
+    @return unit *)
 let test_is_empty tree expected = assert_equal (is_empty tree) expected
+
+(** [test_mem elem tree expected] checks if the element [elem] is in the set
+    [tree] and compares the result to [expected].
+    @param elem the element to check for membership
+    @param tree the set tree to test
+    @param expected the expected boolean result
+    @return unit *)
 let test_mem elem tree expected = assert_equal (mem elem tree) expected
 
-(* Helper to test insertions using to_string for easier comparison *)
+(** [test_insert elem tree expected_tree] inserts [elem] into [tree] and checks
+    if the result matches [expected_tree].
+    @param elem the element to insert
+    @param tree the initial set tree
+    @param expected_tree the expected resulting set tree after insertion
+    @return unit *)
 let test_insert elem tree expected_tree =
   let actual = to_string string_of_int (insert elem tree) in
   let expected = to_string string_of_int expected_tree in
   assert_equal actual expected
 
+(** [test_random_insertions count] tests the insertion of [count] randomly
+    generated unique integers (1 to 100) into a set. After insertion, it checks
+    for membership of each inserted element and verifies the absence of
+    non-inserted elements.
+    @param count the number of elements to insert and test
+    @return unit *)
 let test_random_insertions count =
-  (* Generate a list of unique random numbers between 1 and 100 *)
   let rec generate_random_list n acc =
     if n <= 0 then acc
     else
@@ -22,82 +45,69 @@ let test_random_insertions count =
   in
   let numbers = generate_random_list count [] in
 
-  (* Insert each number into the set *)
   let tree = List.fold_left (fun acc num -> insert num acc) empty numbers in
 
-  (* Test that each inserted number is in the set *)
   List.iter (fun num -> assert_equal (mem num tree) true) numbers;
 
-  (* Optionally test some random numbers not in the list *)
   List.iter
     (fun num ->
       if not (List.mem num numbers) then assert_equal (mem num tree) false)
     (generate_random_list count [])
 
+(** [tests] is a suite of unit tests for set operations, including checks on
+    emptiness, membership, insertion, and special cases for TwoNode and
+    ThreeNode configurations in a tree set.
+    @return unit *)
 let tests =
   "test suite"
   >::: [
-         (* Testing 1. is_empty empty = true *)
          ("test empty tree" >:: fun _ -> test_is_empty empty true);
-         (* Testing 2. is_empty (insert x s) = false *)
          ( "test non-empty tree" >:: fun _ ->
            let tree = insert 1 empty in
            test_is_empty tree false );
-         (* Testing 3. mem x empty = false *)
          ("test mem empty tree" >:: fun _ -> test_mem 1 empty false);
-         (* Testing 4. mem y (insert x s) = true if x = y *)
          ( "test mem non-empty tree true" >:: fun _ ->
            let tree = insert 1 empty in
            test_mem 1 tree true );
-         (* Testing 5. mem y (insert x s) = mem y s if x <> y *)
          ( "test mem non_empty tree false" >:: fun _ ->
            let tree = insert 2 empty in
            test_mem 1 tree false );
-         (* Case: mem x in a ThreeNode where x = v1 *)
          ( "test mem ThreeNode where x = v1" >:: fun _ ->
            let tree =
              create_three_node 2 5 (insert 1 empty) (insert 3 empty)
                (insert 6 empty)
            in
            test_mem 2 tree true );
-         (* Case: mem x in a ThreeNode where x = v2 *)
          ( "test mem ThreeNode where x = v2" >:: fun _ ->
            let tree =
              create_three_node 2 5 (insert 1 empty) (insert 3 empty)
                (insert 6 empty)
            in
            test_mem 5 tree true );
-         (* Case: mem x in a ThreeNode where x < v1 *)
          ( "test mem ThreeNode where x < v1" >:: fun _ ->
            let tree =
              create_three_node 4 7 (insert 2 empty) (insert 5 empty)
                (insert 8 empty)
            in
            test_mem 2 tree true );
-         (* Case: mem x in a ThreeNode where v1 < x < v2 *)
          ( "test mem ThreeNode where v1 < x < v2" >:: fun _ ->
            let tree =
              create_three_node 3 6 (insert 2 empty) (insert 4 empty)
                (insert 7 empty)
            in
            test_mem 4 tree true );
-         (* Case: mem x in a ThreeNode where x > v2 *)
          ( "test mem ThreeNode where x > v2" >:: fun _ ->
            let tree =
              create_three_node 3 6 (insert 2 empty) (insert 4 empty)
                (insert 8 empty)
            in
            test_mem 8 tree true );
-         (* Handling of duplicates *)
-         (* Case: Insert duplicate into TwoNode *)
          ( "test insert duplicate into TwoNode" >:: fun _ ->
            let tree = create_two_node 5 empty empty in
            test_insert 5 tree tree );
-         (* Case: Insert duplicate into ThreeNode *)
          ( "test insert duplicate into ThreeNode" >:: fun _ ->
            let tree = create_three_node 2 5 empty empty empty in
            test_insert 2 tree tree );
-         (* Complex nested ThreeNodes insertions 1 *)
          ( "test complex insertions" >:: fun _ ->
            let tree = empty in
            let tree = insert 2 tree in
@@ -112,7 +122,6 @@ let tests =
              ~printer:(fun x -> x)
              (to_string string_of_int expected)
              (to_string string_of_int tree) );
-         (* Complex nested ThreeNodes insertions 2 *)
          ( "test complex insertions" >:: fun _ ->
            let tree = empty in
            let tree = insert 2 tree in
@@ -127,7 +136,6 @@ let tests =
              ~printer:(fun x -> x)
              (to_string string_of_int expected)
              (to_string string_of_int tree) );
-         (* Complex nested ThreeNodes insertions 3 *)
          ( "test complex insertions" >:: fun _ ->
            let tree = empty in
            let tree = insert 2 tree in
@@ -142,7 +150,6 @@ let tests =
              ~printer:(fun x -> x)
              (to_string string_of_int expected)
              (to_string string_of_int tree) );
-         (* Complex nested ThreeNodes insertions 4 *)
          ( "test complex insertions" >:: fun _ ->
            let tree = empty in
            let tree = insert 5 tree in

@@ -1,25 +1,38 @@
 open A6.Set
 open Unix
 
-(** [time f x] measures the time it takes to run [f x] *)
+(** [time f x] is the time, in seconds, it takes to run function [f] with
+    argument [x].
+    @param f the function to time
+    @param x the argument to apply to [f]
+    @return the time in seconds taken to execute [f x] *)
 let time f x =
   let start = gettimeofday () in
   let _ = f x in
   let stop = gettimeofday () in
   stop -. start
 
-(** [insert_elements n] inserts [n] distinct elements into the set *)
+(** [insert_elements n] inserts [n] distinct elements (1 to [n]) into a set,
+    starting with an empty set.
+    @param n the number of elements to insert into the set
+    @return unit *)
 let insert_elements n =
   let tree = ref empty in
   for i = 1 to n do
     tree := insert i !tree
   done
 
-(** [experiment] conducts the performance experiment by inserting elements for
-    different values of n *)
+(** [experiment] runs a performance test for insertion operations by measuring
+    the time taken to insert a range of elements into the set. The experiment is
+    conducted for various values of [n] in logarithmic increments, where [n]
+    represents the number of elements inserted. For each [n], it prints:
+    - The value of [n]
+    - The time taken to insert [n] elements
+    - The value of [n * log(n)] as a theoretical comparison
+
+    @return unit *)
 let experiment () =
-  (* We will generate n values in logarithmic scale from 100,000 to
-     100,000,000 *)
+  (* List of values of n to test, ranging from 500,000 to 500,000,000 *)
   let n_values =
     [
       500000;
@@ -51,5 +64,5 @@ let experiment () =
       flush Stdlib.stdout (* Flushing the output to stdout correctly *))
     n_values
 
-(* Run the experiment when this program is executed *)
+(* Runs the experiment when the program is executed *)
 let () = experiment ()

@@ -14,7 +14,7 @@ val to_string : ('a -> string) -> 'a t -> string
 (** [to_string s] returns a string representation of set [s], useful for
     debugging. *)
 
-val insert : int -> int t -> int t
+val insert : 'a -> 'a t -> 'a t
 (** [insert x s] returns a new set that includes [x] in [s]. If [x] is already
     in [s], returns [s] unchanged. *)
 
