@@ -1,0 +1,16 @@
+N, Time, N Log N
+500000,0.425973,2.84949e+06
+750000,0.657494,4.4063e+06
+1000000,0.925359,6e+06
+5000000,5.04471,3.34949e+07
+7500000,7.9186,5.1563e+07
+10000000,10.6904,7e+07
+50000000,58.1957,3.84949e+08
+75000000,92.5443,5.9063e+08
+100000000,120.496,8e+08
+500000000,718.309,4.34949e+09
+
+I performed the linear regression by putting all the data into google spreadsheet, graphed the data onto a plot, 
+and then used the formula =LINEST(B2:B11, C2:C11, TRUE, TRUE) to find r^2.
+
+My r^2 was 0.9996995693.

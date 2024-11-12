@@ -11,6 +11,29 @@ let test_insert elem tree expected_tree =
   let expected = to_string string_of_int expected_tree in
   assert_equal actual expected
 
+let test_random_insertions count =
+  (* Generate a list of unique random numbers between 1 and 100 *)
+  let rec generate_random_list n acc =
+    if n <= 0 then acc
+    else
+      let num = Random.int 100 + 1 in
+      if List.mem num acc then generate_random_list n acc
+      else generate_random_list (n - 1) (num :: acc)
+  in
+  let numbers = generate_random_list count [] in
+
+  (* Insert each number into the set *)
+  let tree = List.fold_left (fun acc num -> insert num acc) empty numbers in
+
+  (* Test that each inserted number is in the set *)
+  List.iter (fun num -> assert_equal (mem num tree) true) numbers;
+
+  (* Optionally test some random numbers not in the list *)
+  List.iter
+    (fun num ->
+      if not (List.mem num numbers) then assert_equal (mem num tree) false)
+    (generate_random_list count [])
+
 let tests =
   "test suite"
   >::: [
@@ -137,6 +160,18 @@ let tests =
              ~printer:(fun x -> x)
              (to_string string_of_int expected)
              (to_string string_of_int tree) );
+         ( "Test mem" >:: fun _ ->
+           let new_set = insert 5 empty in
+           let set_two = insert 6 new_set in
+           let set_three = insert 4 set_two in
+           let set_four = insert 7 set_three in
+           let set_five = insert 8 set_four in
+           assert_equal (mem 5 set_five) true;
+           assert_equal (mem 4 set_five) true;
+           assert_equal (mem 6 set_five) true;
+           assert_equal (mem 7 set_five) true;
+           assert_equal (mem 8 set_five) true );
+         ("test random insertions" >:: fun _ -> test_random_insertions 20);
        ]
 
 let _ = run_test_tt_main tests
